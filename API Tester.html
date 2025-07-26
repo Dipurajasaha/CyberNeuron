@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intrusion Detection API Tester</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .grid-cols-auto-fit {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Intrusion Detection Model</h1>
+            <p class="text-gray-600 mb-6">Use this form to send data to the prediction API.</p>
+
+            <form id="prediction-form" class="space-y-6">
+                <div id="form-fields" class="grid grid-cols-auto-fit gap-4">
+                    <!-- Input fields will be dynamically generated here -->
+                </div>
+
+                <div class="flex justify-end pt-4">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                        Get Prediction
+                    </button>
+                </div>
+            </form>
+
+            <div id="result-container" class="mt-8 p-6 bg-gray-50 rounded-xl border border-gray-200 hidden">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Prediction Result:</h2>
+                <pre id="result" class="bg-gray-900 text-white p-4 rounded-lg text-lg whitespace-pre-wrap break-all"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const formFieldsContainer = document.getElementById('form-fields');
+            const predictionForm = document.getElementById('prediction-form');
+            const resultContainer = document.getElementById('result-container');
+            const resultElement = document.getElementById('result');
+
+            // These are the features your model expects.
+            const features = [
+                'Destination Port', 'Flow Duration', 'Total Fwd Packets', 'Total Backward Packets', 
+                'Total Length of Fwd Packets', 'Total Length of Bwd Packets', 'Fwd Packet Length Max', 
+                'Fwd Packet Length Min', 'Fwd Packet Length Mean', 'Fwd Packet Length Std', 
+                'Bwd Packet Length Max', 'Bwd Packet Length Min', 'Bwd Packet Length Mean', 
+                'Bwd Packet Length Std', 'Flow Bytes/s', 'Flow Packets/s', 'Flow IAT Mean', 
+                'Flow IAT Std', 'Flow IAT Max', 'Flow IAT Min', 'Fwd IAT Total', 'Fwd IAT Mean', 
+                'Fwd IAT Std', 'Fwd IAT Max', 'Fwd IAT Min', 'Bwd IAT Total', 'Bwd IAT Mean', 
+                'Bwd IAT Std', 'Bwd IAT Max', 'Bwd IAT Min', 'Fwd PSH Flags', 'Bwd PSH Flags', 
+                'Fwd URG Flags', 'Bwd URG Flags', 'Fwd Header Length', 'Bwd Header Length', 
+                'Fwd Packets/s', 'Bwd Packets/s', 'Min Packet Length', 'Max Packet Length', 
+                'Packet Length Mean', 'Packet Length Std', 'Packet Length Variance', 'FIN Flag Count', 
+                'SYN Flag Count', 'RST Flag Count', 'PSH Flag Count', 'ACK Flag Count', 'URG Flag Count', 
+                'CWE Flag Count', 'ECE Flag Count', 'Down/Up Ratio', 'Average Packet Size', 
+                'Avg Fwd Segment Size', 'Avg Bwd Segment Size', 'Fwd Header Length.1', 
+                'Fwd Avg Bytes/Bulk', 'Fwd Avg Packets/Bulk', 'Fwd Avg Bulk Rate', 
+                'Bwd Avg Bytes/Bulk', 'Bwd Avg Packets/Bulk', 'Bwd Avg Bulk Rate', 
+                'Subflow Fwd Packets', 'Subflow Fwd Bytes', 'Subflow Bwd Packets', 
+                'Subflow Bwd Bytes', 'Init_Win_bytes_forward', 'Init_Win_bytes_backward', 
+                'act_data_pkt_fwd', 'min_seg_size_forward', 'Active Mean', 'Active Std', 
+                'Active Max', 'Active Min', 'Idle Mean', 'Idle Std', 'Idle Max', 'Idle Min'
+            ];
+            
+            // Example data to pre-fill the form
+            const exampleData = {
+                "Destination Port": 80, "Flow Duration": 112642, "Total Fwd Packets": 3, "Total Backward Packets": 0,
+                "Total Length of Fwd Packets": 0, "Total Length of Bwd Packets": 0, "Fwd Packet Length Max": 0,
+                "Fwd Packet Length Min": 0, "Fwd Packet Length Mean": 0, "Fwd Packet Length Std": 0,
+                "Bwd Packet Length Max": 0, "Bwd Packet Length Min": 0, "Bwd Packet Length Mean": 0,
+                "Bwd Packet Length Std": 0, "Flow Bytes/s": 0, "Flow Packets/s": 26.63, "Flow IAT Mean": 56321,
+                "Flow IAT Std": 0, "Flow IAT Max": 56321, "Flow IAT Min": 56321, "Fwd IAT Total": 112642,
+                "Fwd IAT Mean": 56321, "Fwd IAT Std": 0, "Fwd IAT Max": 56321, "Fwd IAT Min": 56321,
+                "Bwd IAT Total": 0, "Bwd IAT Mean": 0, "Bwd IAT Std": 0, "Bwd IAT Max": 0, "Bwd IAT Min": 0,
+                "Fwd PSH Flags": 0, "Bwd PSH Flags": 0, "Fwd URG Flags": 0, "Bwd URG Flags": 0,
+                "Fwd Header Length": 96, "Bwd Header Length": 0, "Fwd Packets/s": 26.63, "Bwd Packets/s": 0,
+                "Min Packet Length": 0, "Max Packet Length": 0, "Packet Length Mean": 0, "Packet Length Std": 0,
+                "Packet Length Variance": 0, "FIN Flag Count": 0, "SYN Flag Count": 0, "RST Flag Count": 0,
+                "PSH Flag Count": 0, "ACK Flag Count": 1, "URG Flag Count": 0, "CWE Flag Count": 0,
+                "ECE Flag Count": 0, "Down/Up Ratio": 0, "Average Packet Size": 0, "Avg Fwd Segment Size": 0,
+                "Avg Bwd Segment Size": 0, "Fwd Header Length.1": 96, "Fwd Avg Bytes/Bulk": 0,
+                "Fwd Avg Packets/Bulk": 0, "Fwd Avg Bulk Rate": 0, "Bwd Avg Bytes/Bulk": 0,
+                "Bwd Avg Packets/Bulk": 0, "Bwd Avg Bulk Rate": 0, "Subflow Fwd Packets": 3,
+                "Subflow Fwd Bytes": 0, "Subflow Bwd Packets": 0, "Subflow Bwd Bytes": 0,
+                "Init_Win_bytes_forward": 29200, "Init_Win_bytes_backward": -1, "act_data_pkt_fwd": 0,
+                "min_seg_size_forward": 32, "Active Mean": 0, "Active Std": 0, "Active Max": 0,
+                "Active Min": 0, "Idle Mean": 0, "Idle Std": 0, "Idle Max": 0, "Idle Min": 0
+            };
+
+            // Dynamically create an input field for each feature
+            features.forEach(feature => {
+                const div = document.createElement('div');
+                const label = document.createElement('label');
+                label.htmlFor = feature;
+                label.className = 'block text-sm font-medium text-gray-700 mb-1';
+                label.textContent = feature;
+
+                const input = document.createElement('input');
+                input.type = 'text'; // Use text to allow for decimals
+                input.name = feature;
+                input.id = feature;
+                input.className = 'block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm';
+                input.value = exampleData[feature] !== undefined ? exampleData[feature] : '0';
+
+                div.appendChild(label);
+                div.appendChild(input);
+                formFieldsContainer.appendChild(div);
+            });
+
+            // Handle form submission
+            predictionForm.addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent the default form submission
+                
+                resultContainer.classList.remove('hidden');
+                resultElement.textContent = 'Loading...';
+
+                const formData = new FormData(predictionForm);
+                const data = {};
+                // Convert form data to a plain object, parsing numbers
+                for (let [key, value] of formData.entries()) {
+                    data[key] = parseFloat(value) || 0; // Convert to number, default to 0 if invalid
+                }
+
+                // Send the data to the Flask API
+                fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                })
+                .then(response => response.json())
+                .then(prediction => {
+                    resultElement.textContent = JSON.stringify(prediction, null, 2);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    resultElement.textContent = `Error: Could not connect to the API. Make sure the app.py server is running.\n\n${error}`;
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
