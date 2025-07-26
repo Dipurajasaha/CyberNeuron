@@ -1,5 +1,4 @@
-# CyberNeuron
-# Network Intrusion Detection using Deep Learning
+# CyberNeuron : Network Intrusion Detection using Deep Learning
 
 This project presents a deep learning-based approach for detecting network intrusions. The model leverages a hybrid architecture of Convolutional Neural Networks (CNN) and Long Short-Term Memory (LSTM) to effectively classify network traffic from the CIC-IDS2017 dataset.
 
@@ -30,13 +29,14 @@ The neural network architecture is designed to capture both spatial and temporal
 ## Feature Importance
 To understand the model's decision-making process, SHAP (SHapley Additive exPlanations) was employed. The plot below highlights the most influential features in detecting intrusions.
 
-![Feature Importance using SHAP](Feature%20Importance%20using%20SHAP.png)
+<img src="Feature%20Importance%20using%20SHAP.png" alt="Feature Importance using SHAP" width="50%">
 
 ## Performance
 The model demonstrates strong performance, achieving an accuracy of **above 90%** on the unseen test set.
 
 ## File Structure
 
+<pre>
 .
 ├── Dataset/
 │   └── ... (CIC-IDS2017 CSV files)
@@ -46,15 +46,15 @@ The model demonstrates strong performance, achieving an accuracy of **above 90%*
 ├── intrusion_detection.py
 ├── requirements.txt
 └── README.md
-
+</pre>
 
 ## Installation
 To set up the project environment, you can install the necessary dependencies using pip.
 
 1.  Clone the repository:
     ```bash
-    git clone <your-repository-link>
-    cd <repository-name>
+    git clone https://github.com/Dipurajasaha/CyberNeuron.git
+    cd CyberNeuron
     ```
 2.  Install the required packages from `requirements.txt`:
     ```bash
