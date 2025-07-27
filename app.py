@@ -1,11 +1,16 @@
 import os
 import numpy as np
 import pandas as pd
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from tensorflow.keras.models import load_model
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 app = Flask(__name__)
+
+
+@app.route('/')
+def home():
+    return render_template('API_Tester.html')
 
 CHECKPOINT_DIR = 'Model'
 MODEL_FILE = os.path.join(CHECKPOINT_DIR, 'best_model.keras')
