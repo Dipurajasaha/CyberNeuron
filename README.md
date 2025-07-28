@@ -24,7 +24,7 @@ The neural network architecture is designed to capture both spatial and temporal
 3.  An **LSTM Layer** to model the sequential nature of the data.
 4.  Two **Dense Layers** for the final classification task.
 
-<img src="model_architecture.jpg" alt="Feature Importance using SHAP" width="30%">
+<img src="model_architecture.jpg" alt="Feature Importance using SHAP" width="10%">
 
 ## Feature Importance
 To understand the model's decision-making process, SHAP (SHapley Additive exPlanations) was employed. The plot below highlights the most influential features in detecting intrusions.
